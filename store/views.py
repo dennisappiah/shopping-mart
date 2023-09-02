@@ -22,7 +22,6 @@ from .serializers import (
     UpdateCartItemSerializer,
     CustomerSerializer,
     OrderSerializer,
-    OrderItemSerializer,
     CreateOrderSerializer,
     UpdateOrderSerializer,
 )
@@ -138,7 +137,7 @@ class CustomerViewSet(ModelViewSet):
 
 
 class OrderViewSet(ModelViewSet):
-    http_method_names = ["get", "patch", "delete", "head", "options"]
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
     """
     - Admin should be able to see all orders, and detail operations
     - a customer should only be able to see his own order and not that of others

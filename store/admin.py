@@ -84,7 +84,13 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ["phone", "user"]
+    list_display = ["first_name", "last_name", "membership_status"]
+    list_editable = ["membership_status"]
+    list_select_related = ["user"]
+    ordering = ["user__first_name", "user__last_name"]
+    list_per_page = 10
+    search_fields = ["first_name__istartswith", "last_name__istartswith"]
+    autocomplete_fields = ["user"]
 
 
 # managing children models using inlines(orderItems)

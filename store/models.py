@@ -1,14 +1,16 @@
 from uuid import uuid4
+from django.contrib import admin
 from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.db.models import CharField
 
 
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
     discount = models.FloatField()
 
-    def __str__(self) -> str:
+    def __str__(self) -> CharField:
         return self.description
 
 
@@ -19,7 +21,7 @@ class Collection(models.Model):
     class Meta:
         ordering = ["title"]
 
-    def __str__(self) -> str:
+    def __str__(self) -> CharField:
         return self.title
 
 
@@ -33,14 +35,13 @@ class Product(models.Model):
         validators=[MinValueValidator(1, message="unit price cannot less than 1")],
     )
     inventory = models.IntegerField()
-    # date updates as Product object is updated
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(
         Collection, related_name="products", on_delete=models.PROTECT
     )
     promotions = models.ManyToManyField(Promotion, related_name="products", blank=True)
 
-    def __str__(self) -> str:
+    def __str__(self) -> CharField:
         return self.title
 
     class Meta:
@@ -71,11 +72,20 @@ class Customer(models.Model):
     membership_status = models.CharField(
         max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE
     )
+    # profile_image
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     # orders
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+
+    @admin.display(ordering="user__first_name")
+    def first_name(self):
+        return self.user.first_name
+
+    @admin.display(ordering="user__last_name")
+    def last_name(self):
+        return self.user.last_name
 
     class Meta:
         ordering = ["user__first_name", "user__last_name"]
@@ -100,6 +110,9 @@ class Order(models.Model):
         Customer, on_delete=models.PROTECT, related_name="orders"
     )
     # items
+
+    class Meta:
+        permissions = [("cancel_order", "Can Cancel Order")]
 
 
 class OrderItem(models.Model):

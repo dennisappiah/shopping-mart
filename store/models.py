@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import CharField
+from store.validators import validate_file_size
 
 
 class Promotion(models.Model):
@@ -55,6 +56,16 @@ class Review(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateField(auto_now_add=True)
+
+
+"""Assuming a product can have multiple images"""
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.ImageField(upload_to="store/images", validators=[validate_file_size])
 
 
 class Customer(models.Model):

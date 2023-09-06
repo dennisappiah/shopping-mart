@@ -24,6 +24,7 @@ from .serializers import (
     OrderSerializer,
     CreateOrderSerializer,
     UpdateOrderSerializer,
+    ProductImageSerializer,
 )
 from .models import (
     Cart,
@@ -34,6 +35,7 @@ from .models import (
     Review,
     Customer,
     Order,
+    ProductImage,
 )
 from .filters import ProductFilter
 from .permissions import IsAdminOrViewOnly
@@ -57,7 +59,9 @@ class CollectionViewSet(ModelViewSet):
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.select_related("collection").all()
+    queryset = (
+        Product.objects.select_related("collection").prefetch_related("images").all()
+    )
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
@@ -87,6 +91,16 @@ class ReviewViewSet(ModelViewSet):
     # overriding the queryset to filter the product_pk from the request url
     def get_queryset(self):
         return Review.objects.filter(product_id=self.kwargs["product_pk"])
+
+
+class ProductImageViewSet(ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_serializer_context(self):
+        return {"product_id": self.kwargs["product_pk"]}
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs["product_pk"])
 
 
 class CartViewSet(

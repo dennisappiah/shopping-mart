@@ -5,7 +5,7 @@ from django.contrib import admin, messages
 from django.db.models import Count
 from django.utils.html import format_html, urlencode
 from django.urls import reverse
-from store.models import Product, Customer, Order, Collection, OrderItem
+from store.models import Product, Customer, Order, Collection, OrderItem, ProductImage
 
 
 # Register your models here.
@@ -21,7 +21,7 @@ class CollectionAdmin(admin.ModelAdmin):
             + "?"
             + urlencode({"collection__id": collection.id})
         )
-        return format_html('<a href="{}">{}</a>', url, collection.products_count)
+        return format_html(f'<a href="{url}">{collection.products_count}</a>')
 
     # overriding the base queryset to annotate `products_count`
     def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
@@ -39,6 +39,16 @@ class InventoryFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "<10":
             return queryset.filter(inventory__lt=10)
+
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    readonly_fields = ["thumbnail"]
+
+    def thumbnail(self, instance):
+        if instance.image.name != "":
+            return format_html(f'<img src="{instance.image.url}" class="thumbnail" />')
+        return ""
 
 
 @admin.register(Product)
@@ -59,6 +69,7 @@ class ProductAdmin(admin.ModelAdmin):
     # customising the Product Add form
     autocomplete_fields = ["collection"]
     prepopulated_fields = {"slug": ["title"]}
+    inlines = [ProductImageInline]
 
     # Adding computed columns -> custom row level computation
     @admin.display(ordering="inventory")

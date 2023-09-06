@@ -12,8 +12,15 @@ drf-nested-routers = "*"
 django-filter = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+pillow = "*"
+django-cors-headers = "*"
+whitenoise = "*"
+gunicorn = "*"
+dj-database-url = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.9"

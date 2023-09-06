@@ -8,6 +8,7 @@ from .models import (
     Customer,
     Order,
     OrderItem,
+    ProductImage,
 )
 from decimal import Decimal
 from django.db import transaction
@@ -21,8 +22,22 @@ class CollectionSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "products_count"]
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ["id", "image"]
+
+    def save(self, **kwargs):
+        product_id = self.context["product_id"]
+        self.instance = ProductImage.objects.create(
+            product_id=product_id, **self.validated_data
+        )
+        return self.instance
+
+
 class ProductSerializer(serializers.ModelSerializer):
     price_with_tax = serializers.SerializerMethodField(method_name="calculate_tax")
+    images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -33,6 +48,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "inventory",
             "collection",
             "price_with_tax",
+            "images",
         ]
 
     def calculate_tax(self, product: Product):
@@ -46,7 +62,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         product_id = self.context["product_id"]
-        Review.objects.create(product_id=product_id, **self.validated_data)
+        self.instance = Review.objects.create(
+            product_id=product_id, **self.validated_data
+        )
+        return self.instance
 
 
 class AddCartItemSerializer(serializers.ModelSerializer):

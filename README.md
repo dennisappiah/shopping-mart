@@ -5,13 +5,13 @@ Dennify Store API is a RESTFul  service for managing api endpoints of an imagina
 ## Features
 
 - [x] Anonymous users can only view products unless authenticated as admin for other operations
-- Pagination, Filtering, and Sorting at the products endpoint
+- [x] Pagination, Filtering, and Sorting at the products endpoint
 - [x] Anonymous users can add items to their cart without a login
 - [x] Authenticated users can create, retrieve, update and delete an order
 - [x] Customers can view their profile
 - [x] Users are automatically profiled as customers when they are registered
-- [ ] Admin (staff) Users have access within their control
-- [ ] SuperAdmin users have all accesses and permissions
+- [x] Admin (staff) Users have access within their control
+- [x] SuperAdmin users have all accesses and permissions
 
 
 ### FOR LOCAL DEVELOPMENT
